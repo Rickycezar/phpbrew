@@ -11,6 +11,8 @@ use PhpBrew\Testing\CommandTestCase;
 
 class KnownCommandTest extends CommandTestCase {
 
+    public $usesVCR = true;
+
     public function testPeclPackage() {
 
         $logger = new Logger;
@@ -28,6 +30,10 @@ class KnownCommandTest extends CommandTestCase {
 
     public function testGithubPackage()
     {
+        if (getenv('TRAVIS')) {
+            $this->markTestSkipped('Avoid bugging GitHub on Travis since the test is likely to fail because of a 403');
+        }
+
         $logger = new Logger;
         $logger->setQuiet();
 
@@ -35,6 +41,9 @@ class KnownCommandTest extends CommandTestCase {
         $provider->setOwner('phalcon');
         $provider->setRepository('cphalcon');
         $provider->setPackageName('phalcon');
+        if(getenv('github_token')) { //load token from travis-ci
+            $provider->setAuth(getenv('github_token'));
+        }
 
         $extensionDownloader = new ExtensionDownloader($logger, new OptionResult);
         $versionList = $extensionDownloader->knownReleases($provider);
@@ -59,4 +68,4 @@ class KnownCommandTest extends CommandTestCase {
     }
 
 }
- 
+

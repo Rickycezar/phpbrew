@@ -7,16 +7,19 @@ use PhpBrew\BuildFinder;
 /**
  * The install command tests are heavy.
  *
- * Don't catch the exceptions, the system command exception 
+ * Don't catch the exceptions, the system command exception
  * will show up the error message.
  *
  * Build output will be shown when assertion failed.
  *
  * @large
  * @group command
+ * @group noVCR
  */
 class InstallCommandTest extends CommandTestCase
 {
+    public $usesVCR = false;
+
     /**
      * @group install
      */
@@ -33,6 +36,10 @@ class InstallCommandTest extends CommandTestCase
      */
     public function testInstallCommand()
     {
+        if (getenv('TRAVIS')) {
+            $this->markTestSkipped('Skip heavy test on Travis');
+        }
+
         $versionName = $this->getPrimaryVersion();
         $processorNumber = Machine::getInstance()->detectProcessorNumber();
         $jobs = is_numeric($processorNumber) ? "--jobs $processorNumber" : "";
@@ -65,6 +72,10 @@ class InstallCommandTest extends CommandTestCase
      */
     public function testGitHubInstallCommand()
     {
+        if (getenv('TRAVIS')) {
+            $this->markTestSkipped('Skip heavy test on Travis');
+        }
+
         $this->assertCommandSuccess("phpbrew --debug install --dryrun github:php/php-src@PHP-7.0 as php-7.0.0 +cli+posix");
     }
 

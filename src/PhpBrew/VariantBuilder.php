@@ -136,7 +136,6 @@ class VariantBuilder
             'mbregex',
             'mbstring',
             'mhash',
-            'mcrypt',
             'pcntl',
             'pcre',
             'pdo',
@@ -318,7 +317,7 @@ class VariantBuilder
                     if (file_exists($prefix)) {
                         return "--with-curl=$prefix";
                     }
-                    echo "homebrew prefix '$output' doesn't exist. you forgot to install?\n";
+                    echo "homebrew prefix '$prefix' doesn't exist. you forgot to install?\n";
                 }
             }
             if ($bin = Utils::findBin('curl-config')) {
@@ -326,7 +325,7 @@ class VariantBuilder
                     if (file_exists($prefix)) {
                         return "--with-curl=$prefix";
                     }
-                    echo "homebrew prefix '$output' doesn't exist. you forgot to install?\n";
+                    echo "homebrew prefix '$prefix' doesn't exist. you forgot to install?\n";
                 }
             }
 
@@ -427,7 +426,9 @@ class VariantBuilder
                 $opts[] = '--with-gd=shared';
             }
 
-            $opts[] = '--enable-gd-native-ttf';
+            if ($build->compareVersion('5.5') < 0) {
+                $opts[] = '--enable-gd-native-ttf';
+            }
 
             if ($prefix = Utils::findIncludePrefix('jpeglib.h')) {
                 $opts[] = "--with-jpeg-dir=$prefix";
